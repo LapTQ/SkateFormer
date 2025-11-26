@@ -1,0 +1,65 @@
+work_dir: outputs/train/fs26/v201--satudora_veo3_awlrecord--r1.25-0xauto-1x1--satudora-filter-roi-conf--only-normal-satudora--veo3-all--1s-15frames--split-17-class--v3
+
+phase: train
+
+# feeder
+feeder: feeders.feeder_from_protogcn_format.Feeder
+train_feeder_args:
+  data_path: /home/laptq/ProtoGCN/outputs/convert_pkl_STGCN_to_ProtoGCN/fs26/satudora_veo3_awlrecord--r1.25-0xauto-1x1--satudora-filter-roi-conf--only-normal-satudora--veo3-all--1s-15frames--split-17-class/train.pkl
+  split: train
+  layout: coco_onlyhand
+  aug_method: "123"
+  intra_p: 0.5
+  inter_p: 0.0
+  partition: True
+  class_map: null
+  ske_feat: "j"
+  debug: False
+
+test_feeder_args:
+  data_path: /home/laptq/ProtoGCN/outputs/convert_pkl_STGCN_to_ProtoGCN/fs26/shoplift25min_satudoraR9--r1-0x1-1x3--1s-15frames/val.pkl
+  split: val
+  layout: coco_onlyhand
+  partition: True
+  class_map: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+  ske_feat: "j"
+
+# model
+model: model.SkateFormer.SkateFormer_
+model_args:
+  in_channels: 2
+  num_classes: 17
+  num_people: 1
+  num_points: 6
+  kernel_size: 7
+  num_heads: 32
+  attn_drop: 0.5
+  head_drop: 0.0
+  rel: True
+  drop_path: 0.2
+  type_1_size: [4, 3]
+  type_2_size: [4, 2]
+  type_3_size: [4, 3]
+  type_4_size: [4, 2]
+  mlp_ratio: 4.0
+  index_t: True
+
+#optim
+optimizer: AdamW
+weight_decay: 0.1
+lr_scheduler: cosine
+base_lr: 1e-3
+min_lr: 1e-5
+warmup_lr: 1e-7
+warmup_prefix: False
+warm_up_epoch: 3
+
+# training
+device: [0]
+batch_size: 64
+test_batch_size: 64
+num_epoch: 60
+nesterov: True
+grad_clip: True
+grad_max: 1.0
+loss_type: LSCE

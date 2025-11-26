@@ -57,7 +57,7 @@ class Feeder(Dataset):
         return self
 
     def __getitem__(self, index):
-        data_numpy = self.data[index]
+        data_numpy = self.data[index]   # CTVM
         label = self.label[index]
         data_numpy = np.array(data_numpy)
         valid_frame_num = np.sum(data_numpy.sum(0).sum(-1).sum(-1) != 0)

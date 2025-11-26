@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from timm.models.layers import drop_path, trunc_normal_, Mlp, DropPath, create_act_layer, get_norm_act_layer, create_conv2d
+import math
 
 ''' Partition and Reverse '''
 
@@ -18,7 +19,7 @@ def type_1_partition(input, partition_size):  # partition_size = [N, L]
 
 def type_1_reverse(partitions, original_size, partition_size):  # original_size = [T, V]
     T, V = original_size
-    B = int(partitions.shape[0] / (T * V / partition_size[0] / partition_size[1]))
+    B = partitions.shape[0] // int((T * V / partition_size[0] / partition_size[1]))
     output = partitions.view(B, T // partition_size[0], V // partition_size[1], partition_size[0], partition_size[1], -1)
     output = output.permute(0, 5, 1, 3, 2, 4).contiguous().view(B, -1, T, V)
     return output
@@ -33,7 +34,7 @@ def type_2_partition(input, partition_size):  # partition_size = [N, K]
 
 def type_2_reverse(partitions, original_size, partition_size):  # original_size = [T, V]
     T, V = original_size
-    B = int(partitions.shape[0] / (T * V / partition_size[0] / partition_size[1]))
+    B = partitions.shape[0] // int(T * V / partition_size[0] / partition_size[1])
     output = partitions.view(B, T // partition_size[0], V // partition_size[1], partition_size[0], partition_size[1], -1)
     output = output.permute(0, 5, 1, 3, 4, 2).contiguous().view(B, -1, T, V)
     return output
@@ -48,7 +49,7 @@ def type_3_partition(input, partition_size):  # partition_size = [M, L]
 
 def type_3_reverse(partitions, original_size, partition_size):  # original_size = [T, V]
     T, V = original_size
-    B = int(partitions.shape[0] / (T * V / partition_size[0] / partition_size[1]))
+    B = partitions.shape[0] // int(T * V / partition_size[0] / partition_size[1])
     output = partitions.view(B, T // partition_size[0], V // partition_size[1], partition_size[0], partition_size[1], -1)
     output = output.permute(0, 5, 3, 1, 2, 4).contiguous().view(B, -1, T, V)
     return output
@@ -63,7 +64,7 @@ def type_4_partition(input, partition_size):  # partition_size = [M, K]
 
 def type_4_reverse(partitions, original_size, partition_size):  # original_size = [T, V]
     T, V = original_size
-    B = int(partitions.shape[0] / (T * V / partition_size[0] / partition_size[1]))
+    B = partitions.shape[0] // int(T * V / partition_size[0] / partition_size[1])
     output = partitions.view(B, T // partition_size[0], V // partition_size[1], partition_size[0], partition_size[1], -1)
     output = output.permute(0, 5, 3, 1, 4, 2).contiguous().view(B, -1, T, V)
     return output
@@ -85,28 +86,29 @@ def get_relative_position_index_1d(T):
 
 
 class MultiHeadSelfAttention(nn.Module):
-    def __init__(self, in_channels, rel_type, num_heads=32, partition_size=(1, 1), attn_drop=0., rel=True):
+    def __init__(self, in_channels, rel_type, num_heads=32, attn_drop=0., rel=True):
         super(MultiHeadSelfAttention, self).__init__()
         self.in_channels = in_channels
         self.rel_type = rel_type
         self.num_heads = num_heads
-        self.partition_size = partition_size
+        self.partition_size = None
         self.scale = num_heads ** -0.5
-        self.attn_area = partition_size[0] * partition_size[1]
         self.attn_drop = nn.Dropout(p=attn_drop)
         self.softmax = nn.Softmax(dim=-1)
         self.rel = rel
 
+    def _process_rel(self, device):
+        self.attn_area = self.partition_size[0] * self.partition_size[1]
         if self.rel:
             if self.rel_type == 'type_1' or self.rel_type == 'type_3':
-                self.relative_position_bias_table = nn.Parameter(torch.zeros((2 * partition_size[0] - 1), num_heads))
-                self.register_buffer("relative_position_index", get_relative_position_index_1d(partition_size[0]))
+                self.relative_position_bias_table = nn.Parameter(torch.zeros((2 * self.partition_size[0] - 1), self.num_heads)).to(device)
+                self.register_buffer("relative_position_index", get_relative_position_index_1d(self.partition_size[0]))
                 trunc_normal_(self.relative_position_bias_table, std=.02)
-                self.ones = torch.ones(partition_size[1], partition_size[1], num_heads)
+                self.ones = torch.ones(self.partition_size[1], self.partition_size[1], self.num_heads)
             elif self.rel_type == 'type_2' or self.rel_type == 'type_4':
                 self.relative_position_bias_table = nn.Parameter(
-                    torch.zeros((2 * partition_size[0] - 1), partition_size[1], partition_size[1], num_heads))
-                self.register_buffer("relative_position_index", get_relative_position_index_1d(partition_size[0]))
+                    torch.zeros((2 * self.partition_size[0] - 1), self.partition_size[1], self.partition_size[1], self.num_heads)).to(device)
+                self.register_buffer("relative_position_index", get_relative_position_index_1d(self.partition_size[0]))
                 trunc_normal_(self.relative_position_bias_table, std=.02)
 
     def _get_relative_positional_bias(self):
@@ -122,7 +124,12 @@ class MultiHeadSelfAttention(nn.Module):
             relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()
             return relative_position_bias.unsqueeze(0)
 
-    def forward(self, input):
+    def forward(self, input, partition_size):
+        if self.partition_size is None:
+            self.partition_size = partition_size
+            self._process_rel(input.device)
+        else:
+            assert self.partition_size == partition_size
         B_, N, C = input.shape
         qkv = input.reshape(B_, N, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
         q, k, v = qkv.unbind(0)
@@ -168,7 +175,7 @@ class SkateFormerBlock(nn.Module):
                 MultiHeadSelfAttention(in_channels=in_channels // (len(self.partition_function) * 2),
                                        rel_type=self.rel_type[i],
                                        num_heads=num_heads // (len(self.partition_function) * 2),
-                                       partition_size=self.partition_size[i], attn_drop=attn_drop, rel=rel))
+                                       attn_drop=attn_drop, rel=rel))
         self.attention = nn.ModuleList(attention)
         self.proj = nn.Linear(in_features=in_channels, out_features=in_channels, bias=True)
         self.proj_drop = nn.Dropout(p=drop)
@@ -191,9 +198,28 @@ class SkateFormerBlock(nn.Module):
         y = []
 
         # G-Conv
-        split_f_conv = torch.chunk(f_conv, 2, dim=1)
+        # =========== select either ======== laptq
+        # split_f_conv = torch.chunk(f_conv, 2, dim=1)
+        # ============== or ============== (if want to avoid unsupported operatiors in tensorRT)
+        num_chunk = 2
+        length = f_conv.shape[1]
+        chunk_size = math.ceil(length / num_chunk)
+        num_chunk = math.ceil(length / chunk_size)  # refined num_chunk
+        split_f_conv = [f_conv[:, chunk_idx * chunk_size: (chunk_idx + 1) * chunk_size, ...] for chunk_idx in range(num_chunk)]
+        # ================================
+
         y_gconv = []
-        split_f_gconv = torch.chunk(split_f_conv[0], self.gconv.shape[0], dim=1)
+
+        # =========== select either ======== laptq
+        # split_f_gconv = torch.chunk(split_f_conv[0], self.gconv.shape[0], dim=1)
+        # ============== or ============== (if want to avoid unsupported operatiors in tensorRT)
+        num_chunk = self.gconv.shape[0]
+        length = split_f_conv[0].shape[1]
+        chunk_size = math.ceil(length / num_chunk)
+        num_chunk = math.ceil(length / chunk_size)  # refined num_chunk
+        split_f_gconv = [split_f_conv[0][:, chunk_idx * chunk_size: (chunk_idx + 1) * chunk_size, ...] for chunk_idx in range(num_chunk)]
+        # ================================
+
         for i in range(self.gconv.shape[0]):
             z = torch.einsum('n c t u, v u -> n c t v', split_f_gconv[i], self.gconv[i])
             y_gconv.append(z)
@@ -207,9 +233,14 @@ class SkateFormerBlock(nn.Module):
 
         for i in range(len(self.partition_function)):
             C = split_f_attn[i].shape[1]
-            input_partitioned = self.partition_function[i](split_f_attn[i], self.partition_size[i])
-            input_partitioned = input_partitioned.view(-1, self.partition_size[i][0] * self.partition_size[i][1], C)
-            y.append(self.reverse_function[i](self.attention[i](input_partitioned), (T, V), self.partition_size[i]))
+            T = split_f_attn[i].shape[2]
+            ps = [
+                self.partition_size[i][0] if T > self.partition_size[i][0] else T,
+                self.partition_size[i][1]
+            ]
+            input_partitioned = self.partition_function[i](split_f_attn[i], ps)
+            input_partitioned = input_partitioned.view(-1, ps[0] * ps[1], C)
+            y.append(self.reverse_function[i](self.attention[i](input_partitioned, ps), (T, V), ps))
 
         output = self.proj(torch.cat(y, dim=1).permute(0, 2, 3, 1).contiguous())
         output = self.proj_drop(output)
@@ -425,8 +456,27 @@ class SkateFormer(nn.Module):
             input = self.dropout(input)
         return input if pre_logits else self.head(input)
 
-    def forward(self, input, index_t):
+    def forward(self, input, index_t, to_layout=None):
+        if len(input.shape) == 4: # B, C, T, V
+            input = input.unsqueeze(-1)     # B, C, T, V, 1
+
         B, C, T, V, M = input.shape
+        if T == 15:    # duplicate 1 timestampt to have 16 frames
+            input = torch.cat([input, input[:, :, -1:, :, :]], dim=2)
+
+        B, C, T, V, M = input.shape
+        if index_t is None:     # in case index_t is not provided
+            index_t = (2 * torch.arange(T) / T - 1).repeat(B, 1).float().to(input.device)
+
+        if to_layout == "coco_headless":    # if input is not already in coco_headless layout
+            new_idx = [0, 2, 4, 1, 3, 5, 6, 8, 10, 7, 9, 11]
+            input = input[:, :, :, new_idx, :]
+        elif to_layout == "coco_onlyhand":
+            new_idx = [0, 2, 4, 1, 3, 5]
+        elif to_layout is None:
+            pass
+        else:
+            raise ValueError(f"Layout {to_layout} not recognized")
 
         output = input.permute(0, 1, 2, 4, 3).contiguous().view(B, C, T, -1)  # [B, C, T, M * V]
         for layer in self.stem:
@@ -441,9 +491,9 @@ class SkateFormer(nn.Module):
             output = output + torch.einsum('b t c, c v -> b c t v', te, self.joint_person_embedding)
         else:
             output = output + self.joint_person_temporal_embedding
-        output = self.forward_features(output)
-        output = self.forward_head(output)
-        return output
+        feat = self.forward_features(output)
+        output = self.forward_head(feat)
+        return output, feat.mean(dim=(2, 3)) if self.global_pool == "avg" else torch.amax(feat, dim=(2, 3))
 
 
 def SkateFormer_(**kwargs):
