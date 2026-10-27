@@ -1,4 +1,4 @@
-work_dir: outputs/train/fs26/v244.17_classes.2s-15frames.b
+work_dir: mymodels/checkpoints/fs26/action_recognition/SkateFormer/v244.17_classes.2s-15frames.b
 phase: train
 
 # feeder
@@ -11,6 +11,7 @@ train_feeder_args:
   intra_p: 0.5
   inter_p: 0.0
   partition: True
+  debug: False
   ske_feat: "b"
   shuffle: True
   balance_classes: True
@@ -163,7 +164,7 @@ warm_up_epoch: 3
 
 # training
 device: [0]
-batch_size: 128
+batch_size: 224
 test_batch_size: 1024
 num_epoch: 60
 nesterov: True

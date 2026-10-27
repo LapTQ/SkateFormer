@@ -6,7 +6,7 @@ ls_path_cfg = [
     "v246.17_classes.2s-15frames.bm",
 ]
 num_models = 10
-ls_devices = [1, 1, 1, 1]
+ls_devices = [0, 0, 0, 0]
 
 import sys
 import subprocess
