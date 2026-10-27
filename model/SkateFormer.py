@@ -473,6 +473,7 @@ class SkateFormer(nn.Module):
             input = input[:, :, :, new_idx, :]
         elif to_layout == "coco_onlyhand":
             new_idx = [0, 2, 4, 1, 3, 5]
+            input = input[:, :, :, new_idx, :]
         elif to_layout is None:
             pass
         else:

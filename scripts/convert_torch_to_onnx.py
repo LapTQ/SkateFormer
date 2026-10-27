@@ -16,24 +16,24 @@ model_paths = OrderedDict(
     [
         (
             "j",
-            "/home/laptq/laptq-fs26-shoplifting-detection/runs/SkateFormer/fs26/v219--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2/model_8/best.pt",
+            "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v219--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2/model_8/best.pt",
         ),
-        (
-            "b",
-            "/home/laptq/laptq-fs26-shoplifting-detection/runs/SkateFormer/fs26/v220--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--b/model_3/best.pt",
-        ),
+        # (
+        #     "b",
+        #     "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v220--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--b/model_3/best.pt",
+        # ),
         (
             "jm",
-            "/home/laptq/laptq-fs26-shoplifting-detection/runs/SkateFormer/fs26/v221--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--jm/model_1/best.pt",
+            "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v221--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--jm/model_1/best.pt",
         ),
-        (
-            "bm",
-            "/home/laptq/laptq-fs26-shoplifting-detection/runs/SkateFormer/fs26/v222--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--bm/model_3/best.pt",
-        ),
+        # (
+        #     "bm",
+        #     "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v222--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--bm/model_3/best.pt",
+        # ),
     ]
 )
 
-pathf_output = "/home/laptq/laptq-fs26-shoplifting-detection/outputs/convert-torch-to-onnx/fs26/SkateFormer/{}.onnx".format(
+pathf_output = "/home/laptq/laptq-fs26-shoplifting-detection/data/tmp/convert-torch-to-onnx/skateformer.{}.onnx".format(
     "--".join(
         [
             "{}-{}".format(path.split("/")[-3].split("--")[0], key)

@@ -1,15 +1,15 @@
 
 ls_path_cfg = [
-    "v235--satudora_107cia--2s-15frames--cluster-skeleton-6--j",
-    "v236--satudora_107cia--2s-15frames--cluster-skeleton-6--b",
-    "v237--satudora_107cia--2s-15frames--cluster-skeleton-6--jm",
-    "v238--satudora_107cia--2s-15frames--cluster-skeleton-6--bm",
+    "v243.17_classes.2s-15frames.j",
+    "v244.17_classes.2s-15frames.b",
+    "v245.17_classes.2s-15frames.jm",
+    "v246.17_classes.2s-15frames.bm",
 ]
 num_models = 10
-ls_devices = [3, 3, 3, 3]
+ls_devices = [1, 1, 1, 1]
 
+import sys
 import subprocess
-import multiprocessing as mp
 import concurrent.futures
 
 with concurrent.futures.ProcessPoolExecutor(max_workers=10) as executor:
