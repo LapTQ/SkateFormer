@@ -1,0 +1,137 @@
+work_dir: mymodels/checkpoints/fs26/action_recognition/SkateFormer/v248.11_classes.2s-15frames.b
+phase: train
+
+# feeder
+feeder: feeders.feeder_from_txt.Feeder
+
+train_feeder_args:
+  split: train
+  layout: coco_headless
+  aug_method: "123"
+  intra_p: 0.5
+  inter_p: 0.0
+  partition: True
+  debug: False
+  ske_feat: "b"
+  shuffle: True
+  balance_classes: True
+  target_samples: 6000
+  classes:
+    - "cho_tay_vao_tui_quan"
+    - "cho_tay_vao_tui_ao"
+    - "cho_tay_vao_tui_xach"
+    - "cho_tay_vao_gio_hang"
+    - "cho_tay_vao_xe_hang"
+    - "cho_tay_vao_ke"
+    - "dung_yen"
+    - "ngoi_yen"
+    - "dung_day"
+    - "ngoi_xuong"
+    - "di"
+  train_data:
+    cho_tay_vao_tui_quan:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_quan/train.txt" # 934
+    cho_tay_vao_tui_ao:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_ao/train.txt" # 1101
+    cho_tay_vao_tui_xach:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_xach/train.txt" # 5535
+    cho_tay_vao_gio_hang:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_gio_hang/train.txt" # 2954
+    cho_tay_vao_xe_hang:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_xe_hang/train.txt" # 240
+    cho_tay_vao_ke:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_ke/train.txt" # 110383
+    dung_yen:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_yen/train.txt" # 114752
+    ngoi_yen:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_yen/train.txt" # 4051
+    dung_day:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_day/train.txt" # 107
+    ngoi_xuong:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_xuong/train.txt" # 43
+    di:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/di/train.txt" # 42828
+
+test_feeder_args:
+  split: val
+  layout: coco_headless
+  partition: True
+  ske_feat: "b"
+  shuffle: False
+  eval_metrics: "macro_f1"
+  class_weights: null
+  classes:
+    - "cho_tay_vao_tui_quan"
+    - "cho_tay_vao_tui_ao"
+    - "cho_tay_vao_tui_xach"
+    - "cho_tay_vao_gio_hang"
+    - "cho_tay_vao_xe_hang"
+    - "cho_tay_vao_ke"
+    - "dung_yen"
+    - "ngoi_yen"
+    - "dung_day"
+    - "ngoi_xuong"
+    - "di"
+  val_data:
+    cho_tay_vao_tui_quan:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_quan/val.txt" # 1304
+    cho_tay_vao_tui_ao:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_ao/val.txt" # 1567
+    cho_tay_vao_tui_xach:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_tui_xach/val.txt" # 6421
+    cho_tay_vao_gio_hang:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_gio_hang/val.txt" # 2086
+    cho_tay_vao_xe_hang:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_xe_hang/val.txt" # 0
+    cho_tay_vao_ke:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/cho_tay_vao_ke/val.txt" # 5887
+    dung_yen:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_yen/val.txt" # 21125
+    ngoi_yen:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_yen/val.txt" # 547
+    dung_day:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_day/val.txt" # 1
+    ngoi_xuong:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_xuong/val.txt" # 0
+    di:
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/di/val.txt" # 36495
+
+# model
+model: model.SkateFormer.SkateFormer_
+model_args:
+  in_channels: 2
+  num_classes: 11
+  num_people: 1
+  num_points: 12
+  kernel_size: 7
+  num_heads: 32
+  attn_drop: 0.5
+  head_drop: 0.0
+  rel: True
+  drop_path: 0.2
+  type_1_size: [4, 3]
+  type_2_size: [4, 4]
+  type_3_size: [4, 3]
+  type_4_size: [4, 4]
+  mlp_ratio: 4.0
+  index_t: True
+
+# optim
+optimizer: AdamW
+weight_decay: 0.1
+lr_scheduler: cosine
+base_lr: 1e-4
+min_lr: 1e-6
+warmup_lr: 1e-7
+warmup_prefix: False
+warm_up_epoch: 3
+
+# training
+device: [0]
+batch_size: 224
+test_batch_size: 1024
+num_epoch: 60
+nesterov: True
+grad_clip: True
+grad_max: 1.0
+loss_type: LSCE
