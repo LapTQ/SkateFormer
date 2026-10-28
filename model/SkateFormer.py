@@ -468,7 +468,7 @@ class SkateFormer(nn.Module):
         if index_t is None:     # in case index_t is not provided
             index_t = (2 * torch.arange(T) / T - 1).repeat(B, 1).float().to(input.device)
 
-        if to_layout == "coco_headless":    # if input is not already in coco_headless layout
+        if to_layout == "coco_headless":    # if input is not already in coco_headless re-arranged keypoints' position
             new_idx = [0, 2, 4, 1, 3, 5, 6, 8, 10, 7, 9, 11]
             input = input[:, :, :, new_idx, :]
         elif to_layout == "coco_onlyhand":

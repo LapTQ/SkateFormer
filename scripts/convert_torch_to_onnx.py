@@ -16,27 +16,27 @@ model_paths = OrderedDict(
     [
         (
             "j",
-            "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v219--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2/model_8/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v243.17_classes.2s-15frames.j/model_0/best.pt",
         ),
-        # (
-        #     "b",
-        #     "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v220--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--b/model_3/best.pt",
-        # ),
+        (
+            "b",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v244.17_classes.2s-15frames.b/model_2/best.pt",
+        ),
         (
             "jm",
-            "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v221--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--jm/model_1/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v245.17_classes.2s-15frames.jm/model_0/best.pt",
         ),
-        # (
-        #     "bm",
-        #     "/home/laptq/models/checkpoints/fs26/action_recognition/SkateFormer/v222--satudora_veo3_awlrecord--split-14-class--nodistinct--2s-15frames--v2--bm/model_3/best.pt",
-        # ),
+        (
+            "bm",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v246.17_classes.2s-15frames.bm/model_2/best.pt",
+        ),
     ]
 )
 
-pathf_output = "/home/laptq/laptq-fs26-shoplifting-detection/data/tmp/convert-torch-to-onnx/skateformer.{}.onnx".format(
-    "--".join(
+pathf_output = "mydata/tmp/convert-torch-to-onnx/skateformer.{}.onnx".format(
+    "+".join(
         [
-            "{}-{}".format(path.split("/")[-3].split("--")[0], key)
+            "{}_{}".format(path.split("/")[-3].split(".")[0], key)
             for key, path in model_paths.items()
         ]
     )
@@ -51,14 +51,14 @@ dummy_keypoint = torch.randn(dummy_input_shape)
 example_inputs = (
     dummy_keypoint,
     None,  # index_t
-    "coco_headless",  # to_layout (set this if we're assuming the input is not already in coco_headless layout, else None)
+    "coco_headless",  # to_layout (set this if we're assuming the input is not already in coco_headless re-arranged keypoints' position, else None)
 )
 
 ls_models = OrderedDict()
 for key, model_path in model_paths.items():
     model = SkateFormer_(
         in_channels=2,
-        num_classes=14,
+        num_classes=17,
         num_points=12,
         type_1_size=[4, 3],
         type_2_size=[4, 4],
