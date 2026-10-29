@@ -15,7 +15,7 @@ train_feeder_args:
   ske_feat: "j"
   shuffle: True
   balance_classes: True
-  target_samples: 6000
+  target_balanced_samples: 6000
   classes:
     - "cho_tay_vao_tui_quan"
     - "cho_tay_vao_tui_ao"

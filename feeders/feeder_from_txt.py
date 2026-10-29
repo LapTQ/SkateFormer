@@ -582,7 +582,7 @@ class Feeder(Dataset):
         shuffle=False,
         seed=42,
         balance_classes=False,
-        target_samples=None,
+        target_balanced_samples=None,
         **kwargs,
     ):
         self.classes = list(classes)
@@ -602,7 +602,7 @@ class Feeder(Dataset):
         self.shuffle = shuffle
         self.seed = seed
         self.balance_classes = balance_classes
-        self.target_samples = target_samples
+        self.target_balanced_samples = target_balanced_samples
         self.class_map = np.array(class_map) if class_map is not None else None
 
         self.load_data()
@@ -648,12 +648,12 @@ class Feeder(Dataset):
                 cls_paths.extend(paths)
 
             if self.balance_classes and self.split == "train" and len(cls_paths) > 0:
-                assert self.target_samples is not None
-                if len(cls_paths) > self.target_samples:
+                assert self.target_balanced_samples is not None
+                if len(cls_paths) > self.target_balanced_samples:
                     rng = random.Random(self.seed + idx)
-                    cls_paths = rng.sample(cls_paths, self.target_samples)
-                elif len(cls_paths) < self.target_samples:
-                    repeat = max(1, round(self.target_samples / len(cls_paths)))
+                    cls_paths = rng.sample(cls_paths, self.target_balanced_samples)
+                elif len(cls_paths) < self.target_balanced_samples:
+                    repeat = max(1, round(self.target_balanced_samples / len(cls_paths)))
                     cls_paths = cls_paths * repeat
 
             self.file_paths.extend(cls_paths)
