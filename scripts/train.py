@@ -1,9 +1,9 @@
 
 ls_path_cfg = [
-    "v251.3_classes.2s-15frames.j",
-    "v252.3_classes.2s-15frames.b",
-    "v253.3_classes.2s-15frames.jm",
-    "v254.3_classes.2s-15frames.bm",
+    "v255.10_classes.2s-15frames.j",
+    "v256.10_classes.2s-15frames.b",
+    "v257.10_classes.2s-15frames.jm",
+    "v258.10_classes.2s-15frames.bm",
 ]
 num_models = 3
 ls_devices = [3, 3, 3, 3]

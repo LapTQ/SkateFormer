@@ -37,7 +37,7 @@ train_feeder_args:
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_ke/train.sample_6000.txt" # 6000
     khac:
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_yen/train.sample_6000.txt" # 6000
-      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_yen/train.x1.txt" # 4051
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_yen/train.txt" # 4051
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_day/train.x56.txt" # 5992
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/ngoi_xuong/train.x140.txt" # 6020
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/di/train.sample_6000.txt" # 6000
