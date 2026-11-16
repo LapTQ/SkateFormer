@@ -92,7 +92,7 @@ test_feeder_args:
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_tui_xach/val.txt" # 0
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_gio_hang/val.txt" # 17
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_xe_hang/val.txt" # 0
-      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_ke/val.txt" # 233
+      - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/rut_tay_khoi_ke/val.txt" # 8
     dung_yen:
       - "mydata/processed/fs26/action_recognition/skeleton/action.for_skeleton.17_classes.2s_15frames/dung_yen/val.txt" # 21125
     ngoi_yen:

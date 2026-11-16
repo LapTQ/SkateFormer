@@ -1,12 +1,12 @@
 
 ls_path_cfg = [
-    "v255.10_classes.2s-15frames.j",
-    "v256.10_classes.2s-15frames.b",
-    "v257.10_classes.2s-15frames.jm",
-    "v258.10_classes.2s-15frames.bm",
+    "v259.10_classes.2s-15frames.j.filter_dbscan_95",
+    "v260.10_classes.2s-15frames.b.filter_dbscan_95",
+    "v261.10_classes.2s-15frames.jm.filter_dbscan_95",
+    "v262.10_classes.2s-15frames.bm.filter_dbscan_95",
 ]
 num_models = 3
-ls_devices = [3, 3, 3, 3]
+ls_devices = [1, 1, 1, 1]
 
 import concurrent.futures
 import subprocess

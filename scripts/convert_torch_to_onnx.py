@@ -16,19 +16,19 @@ model_paths = OrderedDict(
     [
         (
             "j",
-            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v247.11_classes.2s-15frames.j/model_2/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v259.10_classes.2s-15frames.j.filter_dbscan_95/model_2/best.pt",
         ),
         (
             "b",
-            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v248.11_classes.2s-15frames.b/model_0/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v260.10_classes.2s-15frames.b.filter_dbscan_95/model_2/best.pt",
         ),
         (
             "jm",
-            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v249.11_classes.2s-15frames.jm/model_1/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v261.10_classes.2s-15frames.jm.filter_dbscan_95/model_1/best.pt",
         ),
         (
             "bm",
-            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v250.11_classes.2s-15frames.bm/model_1/best.pt",
+            "mymodels/checkpoints/fs26/action_recognition/SkateFormer/v262.10_classes.2s-15frames.bm.filter_dbscan_95/model_2/best.pt",
         ),
     ]
 )
@@ -58,7 +58,7 @@ ls_models = OrderedDict()
 for key, model_path in model_paths.items():
     model = SkateFormer_(
         in_channels=2,
-        num_classes=11,
+        num_classes=10,
         num_points=12,
         type_1_size=[4, 3],
         type_2_size=[4, 4],
